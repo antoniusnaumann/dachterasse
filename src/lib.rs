@@ -10,6 +10,4 @@ mod tests {
 mod scrape; 
 mod load; 
 
-pub fn fetch_lectures() -> Vec<(String, String)> {
-    scrape::fetch_lectures()
-}
+pub use crate::scrape::LectureScraper;
