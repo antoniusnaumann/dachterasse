@@ -1,5 +1,9 @@
 use dachterasse;
 
 fn main() {
-    print!("{:?}", dachterasse::fetch_lectures());
+    for lecture in dachterasse::fetch_lectures() {
+        println!("{}", lecture.0);
+        println!("{}", lecture.1);
+        println!("--------------");
+    }
 }
