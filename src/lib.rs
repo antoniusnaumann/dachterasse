@@ -7,7 +7,11 @@ mod tests {
     }
 }
 
-mod scrape; 
-mod load; 
+mod client {
+    pub mod load;
+    pub mod scrape;
+    pub mod repository;
+}
 
-pub use crate::scrape::LectureScraper;
+pub use crate::client::scrape::LectureScraper;
+pub use crate::client::repository::LectureRepository;

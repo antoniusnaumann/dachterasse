@@ -3,9 +3,14 @@ use dachterasse::LectureScraper;
 
 fn main() {
     let scraper = LectureScraper::new();
-    for lecture in scraper.fetch_lectures() {
-        println!("{}", lecture.0);
-        println!("{}", lecture.1);
+    let lectures = scraper.fetch_lectures();
+    for lecture in &lectures {
+        println!("{}", lecture.title);
+        println!("{}", lecture.url);
         println!("--------------");
+    }
+
+    for lecture in &scraper.fetch_lecture_details(Some(lectures)) {
+        println!("{:?}", lecture.categories);
     }
 }

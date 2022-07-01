@@ -1,6 +1,6 @@
 use reqwest::blocking::Client;
 
-pub fn load_lecture_html(url: &str, client: &Client) -> String {
+pub fn unsafe_get(url: &str, client: &Client) -> String {
     client
         .get(url)
         .send()
