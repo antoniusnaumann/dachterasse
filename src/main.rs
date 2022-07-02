@@ -1,4 +1,3 @@
-use dachterasse;
 use dachterasse::LectureScraper;
 
 fn main() {
@@ -11,6 +10,8 @@ fn main() {
     }
 
     for lecture in &scraper.fetch_lecture_details(Some(lectures)) {
-        println!("{:?}", lecture.categories);
+        if let Some(c) = &lecture.categories {
+            println!("{}: {:?}", lecture.title, c);
+        }
     }
 }

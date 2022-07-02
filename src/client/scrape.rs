@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+use futures::StreamExt;
 use regex::Regex;
 use reqwest::blocking::Client;
 use scraper::{Html, Selector};
@@ -14,7 +16,8 @@ pub struct Lecture {
     pub title: String,
     pub url: String,
     // pub description: Option<String>,
-    pub categories: Option<Vec<String>>,
+    // TODO: Categories should be structured this way Degree (e.g. ITSE-MA) -> Category (e.g. OSIS) -> Sub-Category (e.g. OSIS-K)
+    pub categories: Option<HashMap<String, Vec<String>>>,
     // TODO: pub degrees: Vec<Degree> where Degree is an enum containing e.g. ITSE-BA, ITSE-MA and so on
 }
 
@@ -35,7 +38,7 @@ impl LectureScraper {
         fragment.select(&selector)
             .map(|element| {
                 Lecture {
-                    title: String::from(clean(element.text())),
+                    title: clean(element.text()),
                     url: String::from("https://hpi.de") + &link_regex.captures(&*element.html()).unwrap()[0],
                     categories: None
                 }
@@ -53,11 +56,23 @@ impl LectureScraper {
 
             if let Some(inner_fragment) = self.scrape_modules(document.as_str(), "IT-Systems Engineering MA") {
                 let category_list = Html::parse_fragment(inner_fragment.as_str());
-                let category_selector = Selector::parse("li").unwrap();
-                lecture.categories = Some(category_list.select(&category_selector)
-                    .map(|element| String::from(clean(element.text())))
-                    .collect()
-                );
+                let item_selector = Selector::parse("li").unwrap();
+                let categories: Vec<(String, Vec<String>)> = category_list.select(&item_selector)
+                    .map(|element| {
+                        (clean(element.text()),
+                         Html::parse_fragment(element.inner_html().as_str())
+                             .select(&item_selector)
+                             .map(|child| clean(child.text()))
+                             .collect::<Vec<_>>())
+                    })
+                    .filter(|(_, children)| !children.is_empty())
+                    .collect();
+
+                let mut category_map = HashMap::<String, Vec<String>>::new();
+                for mut category in categories {
+                    category_map.entry(category.0).or_insert(Vec::new()).append(&mut category.1);
+                }
+                lecture.categories = Some(category_map);
             }
         }
 
@@ -79,7 +94,11 @@ impl LectureScraper {
     }
 }
 
-fn clean(text: Text) -> &str {
+fn clean(text: Text) -> String {
+    String::from(clean_str(text))
+}
+
+fn clean_str(text: Text) -> &str {
     text.collect::<Vec<_>>()
         .first()
         .unwrap()
