@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use futures::StreamExt;
 use regex::Regex;
 use reqwest::blocking::Client;
 use scraper::{Html, Selector};
