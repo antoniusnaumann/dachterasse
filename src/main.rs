@@ -1,17 +1,19 @@
-use dachterasse::LectureScraper;
+use dachterasse::LectureRepository;
 
 fn main() {
-    let scraper = LectureScraper::new();
-    let lectures = scraper.fetch_lectures();
-    for lecture in &lectures {
+    let mut repo = LectureRepository::new();
+    for lecture in repo.lectures() {
         println!("{}", lecture.title);
         println!("{}", lecture.url);
-        println!("--------------");
-    }
-
-    for lecture in &scraper.fetch_lecture_details(Some(lectures)) {
         if let Some(c) = &lecture.categories {
             println!("{}: {:?}", lecture.title, c);
         }
+        println!("--------------");
+    }
+
+    println!("==============");
+
+    for lecture in repo.lectures() {
+        println!("{}", lecture.title);
     }
 }
