@@ -17,7 +17,6 @@ pub struct Lecture {
     // pub description: Option<String>,
     // TODO: Categories should be structured this way Degree (e.g. ITSE-MA) -> Category (e.g. OSIS) -> Sub-Category (e.g. OSIS-K)
     pub categories: Option<HashMap<String, Vec<String>>>,
-    // TODO: pub degrees: Vec<Degree> where Degree is an enum containing e.g. ITSE-BA, ITSE-MA and so on
 }
 
 impl LectureScraper {
@@ -54,9 +53,9 @@ impl LectureScraper {
             let document = unsafe_get(&lecture.url, &self.client);
 
             if let Some(inner_fragment) = self.scrape_modules(document.as_str(), "IT-Systems Engineering MA") {
-                let category_list = Html::parse_fragment(inner_fragment.as_str());
+                let module_list = Html::parse_fragment(inner_fragment.as_str());
                 let item_selector = Selector::parse("li").unwrap();
-                let categories: Vec<(String, Vec<String>)> = category_list.select(&item_selector)
+                let categories: Vec<(String, Vec<String>)> = module_list.select(&item_selector)
                     .map(|element| {
                         (clean(element.text()),
                          Html::parse_fragment(element.inner_html().as_str())
