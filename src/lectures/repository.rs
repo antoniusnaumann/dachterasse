@@ -39,40 +39,51 @@ impl LectureRepository {
     }
 
     /// Attempts to load cached lecture information from a JSON file
-    pub fn load_cache(&mut self) -> std::io::Result<()> {
-        let file = &self.open_cache()?;
+    pub fn load_cache<P: AsRef<Path>>(&mut self, path: &P) -> std::io::Result<()> {
+        let file = open_cache(path)?;
         self.cache = serde_json::from_reader(file)?;
         Ok(())
     }
 
     /// Serializes cache to JSON and writes it to a file
-    pub fn save_cache(&self) -> std::io::Result<()> {
-        let file = &self.create_cache()?;
+    pub fn save_cache<P: AsRef<Path>>(&self, path: &P) -> std::io::Result<()> {
+        let file = create_cache(path)?;
         serde_json::to_writer(file, &self.cache)?;
         Ok(())
     }
 
     /// Serializes cache to JSON formatted with "pretty"-option and writes it to a file
-    pub fn save_cache_pretty(&self) -> std::io::Result<()> {
-        let file = &self.create_cache()?;
+    pub fn save_cache_pretty<P: AsRef<Path>>(&self, path: &P) -> std::io::Result<()> {
+        let file = create_cache(path)?;
         serde_json::to_writer_pretty(file, &self.cache)?;
         Ok(())
-    }
-
-    fn create_cache(&self) -> std::io::Result<File> {
-        fs::create_dir_all("cache")?;
-        let path = Path::new("cache/lecture_cache.json");
-        File::create(path)
-    }
-
-    fn open_cache(&self) -> std::io::Result<File> {
-        fs::create_dir_all("cache")?;
-        let path = Path::new("cache/lecture_cache.json");
-        File::open(path)
     }
 
     /// Deletes cached lectures to force scraping them again on next getter call.
     pub fn invalidate_cache(&mut self) {
         self.cache = LectureCache::new();
     }
+}
+
+fn create_cache<P: AsRef<Path>>(path: &P) -> std::io::Result<File> {
+    create_parent_directory(path)?;
+    File::create(ensure_extension(path, "json"))
+}
+
+fn open_cache<P: AsRef<Path>>(path: &P) -> std::io::Result<File> {
+    create_parent_directory(path)?;
+    File::open(ensure_extension(path, "json"))
+}
+
+fn create_parent_directory<P: AsRef<Path>>(path: &P) -> std::io::Result<()> {
+    if let Some(directories) = path.as_ref().parent() {
+        fs::create_dir_all(directories)?;
+    }
+    Ok(())
+}
+
+fn ensure_extension<P: AsRef<Path>>(path: &P, extension: &str) -> Box<Path> {
+    let mut buf = path.as_ref().to_path_buf();
+    buf.set_extension(extension);
+    buf.into_boxed_path()
 }
