@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use regex::Regex;
 use reqwest::blocking::Client;
+use serde::{Serialize, Deserialize};
+
 use scraper::{Html, Selector};
 use scraper::element_ref::Text;
 use super::load::unsafe_get;
@@ -11,6 +13,7 @@ pub struct LectureScraper {
     client: Client
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Lecture {
     pub title: String,
     pub url: String,

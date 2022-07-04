@@ -1,8 +1,9 @@
-use dachterasse::LectureRepository;
+use dachterasse::LectureClient;
 
 fn main() {
-    let mut repo = LectureRepository::new();
-    for lecture in repo.lectures() {
+    let mut client = LectureClient::new();
+
+    for lecture in client.lectures() {
         println!("{}", lecture.title);
         println!("{}", lecture.url);
         if let Some(c) = &lecture.categories {
@@ -13,7 +14,7 @@ fn main() {
 
     println!("==============");
 
-    for lecture in repo.lectures() {
+    for lecture in client.lectures() {
         println!("{}", lecture.title);
     }
 }

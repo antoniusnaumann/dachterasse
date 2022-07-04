@@ -7,11 +7,14 @@ mod tests {
     }
 }
 
-mod client {
+mod lectures {
     pub mod load;
     pub mod scrape;
     pub mod repository;
+    pub mod client;
 }
 
-pub use crate::client::scrape::LectureScraper;
-pub use crate::client::repository::LectureRepository;
+pub use crate::lectures::client::LectureClient;
+pub use crate::lectures::scrape::Lecture;
+
+pub use crate::lectures::repository as repository;
