@@ -3,7 +3,7 @@ use std::fs::File;
 use std::path::Path;
 use serde::{Serialize, Deserialize};
 
-use super::scrape::Lecture;
+use super::entities::Lecture;
 use super::scrape::LectureScraper;
 
 #[derive(Default, Serialize, Deserialize)]
@@ -30,7 +30,7 @@ impl LectureRepository {
 
     /// Getter method for lazily loading lectures from scraper.
     /// Subsequent method calls return cached lectures.
-    pub fn lectures(&mut self) -> &Vec<Lecture> {
+    pub fn lectures(&mut self) -> &[Lecture] {
         if self.cache.lectures.is_empty() {
             self.cache.lectures = self.scraper.fetch_lecture_details(None)
         }

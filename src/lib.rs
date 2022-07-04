@@ -13,10 +13,11 @@ mod lectures {
     pub mod repository;
     pub mod client;
     pub mod config;
+    pub mod entities;
 }
 
 pub use crate::lectures::client::LectureClient;
 pub use crate::lectures::config::Config;
-pub use crate::lectures::scrape::Lecture;
+pub use crate::lectures::entities::Lecture;
 
 pub use crate::lectures::repository as repository;

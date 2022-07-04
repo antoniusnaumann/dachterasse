@@ -1,25 +1,15 @@
 use std::collections::HashMap;
 use regex::Regex;
 use reqwest::blocking::Client;
-use serde::{Serialize, Deserialize};
-
 use scraper::{Html, Selector};
 use scraper::element_ref::Text;
 use super::load::unsafe_get;
+use super::entities::Lecture;
 
 // TODO: Build lecture scraper which also follows links and scrapes categories
 #[derive(Default)]
 pub struct LectureScraper {
     client: Client
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Lecture {
-    pub title: String,
-    pub url: String,
-    // pub description: Option<String>,
-    // TODO: Categories should be structured this way Degree (e.g. ITSE-MA) -> Category (e.g. OSIS) -> Sub-Category (e.g. OSIS-K)
-    pub categories: Option<HashMap<String, Vec<String>>>,
 }
 
 impl LectureScraper {
