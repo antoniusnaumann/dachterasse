@@ -28,9 +28,15 @@ impl LectureRepository {
         LectureRepository { scraper: LectureScraper::new(), cache: LectureCache::new() }
     }
 
+    /// Get the curently cached lectures without loading them if not present.
+    /// Returns an empty slice if no lectures are loaded.
+    pub fn lectures(&self) -> &[Lecture] {
+        &self.cache.lectures
+    }
+
     /// Getter method for lazily loading lectures from scraper.
     /// Subsequent method calls return cached lectures.
-    pub fn lectures(&mut self) -> &[Lecture] {
+    pub fn load_lectures(&mut self) -> &[Lecture] {
         if self.cache.lectures.is_empty() {
             self.cache.lectures = self.scraper.fetch_lecture_details(None)
         }

@@ -19,14 +19,27 @@ impl LectureClient {
         client
     }
 
-    // TODO: Convert to async function
-    /// Loads lectures from repository. Repository might load lectures lazily on first attempt, so this could take a while.
-    pub fn lectures(&mut self) -> &[Lecture] {
+    // TODO: Make this return a result if loading was successful
+    /// Triggers initial load for repository data. Should be called before accessing any lecture data.
+    pub fn init(&mut self) {
+        let _ = self.repository.load_lectures();
+    }
+
+    // TODO: This could be ensured by providing client only through interfaces,
+    // TODO: e.g. UnitializedClient and Client. Could also be called in constructor instead but that hides a potentially costly operation
+    /// Calls [init] and returns self
+    pub fn initialized(mut self) -> Self {
+        self.init();
+        self
+    }
+
+    /// Returns lectures from repository. Can return an empty slice if no lectures were loaded yet
+    pub fn lectures(&self) -> &[Lecture] {
         self.repository.lectures()
     }
 
-    // TODO: Maybe change repository methods to lectures() and load_lectures() to make mutation more explicit
-    pub fn all_lectures(&mut self) -> Vec<&Lecture> {
+
+    pub fn all_lectures(&self) -> Vec<&Lecture> {
         self.repository.lectures().iter().collect()
     }
 

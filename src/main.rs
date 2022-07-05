@@ -1,34 +1,143 @@
-use dachterasse::{Config, Lecture, LectureClient};
+use std::env;
 
-fn main() {
-    let mut client = LectureClient::with_config(Config::with_cache());
-
-    print_lectures(&client.all_lectures());
-    println!("==============");
-    print_lectures_detailed(&client.all_lectures());
-
-    println!("\n####################################################################################\n");
-    print_lectures_detailed(&client.filter_lectures(vec!["HCGT: Human Computer Interaction & Computer Graphics Technology", "Professional Skills"]))
+pub struct Command {
+    name: String,
+    help: String,
+    arguments: Vec<(String, String)>,
+    method: fn(&[String])
 }
 
-fn print_lectures(lectures: &[&Lecture]) {
-    for lecture in lectures {
-        println!("{}", lecture.title);
+impl Command {
+    fn new(name: &str, help: &str, method: fn(&[String])) -> Self {
+        Command {
+            name: String::from(name),
+            help: String::from(help),
+            arguments: Vec::new(),
+            method }
+    }
+
+    fn new_with_args(name: &str, help: &str, arguments: &[(&str, &str)], method: fn(&[String])) -> Self {
+        Command {
+            name: String::from(name),
+            help: String::from(help),
+            arguments: arguments.iter().map(|(arg, desc)| (String::from(*arg), String::from(*desc))).collect(),
+            method }
+    }
+
+    fn execute(&self, args: &[String]) {
+        (self.method)(args);
     }
 }
 
-fn print_lectures_detailed(lectures: &[&Lecture]) {
-    for lecture in lectures {
-        println!("{}", lecture.title);
-        println!("{}", lecture.url);
-        if let Some(c) = &lecture.categories {
-            for (module, categories) in c {
-                println!("> {}", module);
-                for category in categories {
-                    println!("\t {}", category);
+fn commands() -> Vec<Command> {
+    let config_arg = ("--config", "Custom path to config. Default is cache/lecture_cache.json");
+
+    vec![
+        Command::new("help", "Prints out this help page",print_help),
+        Command::new_with_args("init", "Initially scrapes the HPI lecture website.", &[config_arg],init_client),
+        Command::new_with_args("overview", "Displays titles for all cached lectures. Please call dachterasse init before.", &[config_arg],show_overview),
+        Command::new_with_args("all", "Shows details for all cached lectures. Please call dachterasse init before.", &[config_arg],show_details),
+    ]
+}
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let cmds = commands();
+
+    if let Some(argument) = args.get(1) {
+        if let Some(cmd) = cmds.iter().find(|cmd| cmd.name.eq_ignore_ascii_case(argument)) {
+            cmd.execute(&args[1..]);
+            return;
+        }
+    }
+
+    print_help(&args[1..])
+}
+
+use commands::*;
+mod commands {
+    use crate::*;
+
+    pub fn print_help(_: &[String]) {
+        for cmd in commands() {
+            print_command_header(&cmd);
+            print_command_args(&cmd);
+        }
+    }
+
+    pub fn init_client(args: &[String]) {
+        client_with_config_args(args).init()
+    }
+
+    pub fn show_overview(args: &[String]) {
+        print_lectures(&client_with_config_args(args).all_lectures());
+    }
+
+    pub fn show_details(args: &[String]) {
+        print_lectures_detailed(&client_with_config_args(args).all_lectures());
+    }
+}
+
+use helpers::*;
+mod helpers {
+    use std::ops::{Add, AddAssign};
+    use dachterasse::{Config, Lecture, LectureClient};
+    use crate::*;
+
+    pub fn client_with_config_args(args: &[String]) -> LectureClient {
+        if args.len() >= 3 && args[1] == "--config" {
+            LectureClient::with_config(Config::new().cache_path(args[1].clone()))
+        } else {
+            LectureClient::with_config(Config::with_cache())
+        }
+    }
+
+    pub fn print_lectures(lectures: &[&Lecture]) {
+        for lecture in lectures {
+            println!("{}", lecture.title);
+        }
+    }
+
+    pub fn print_lectures_detailed(lectures: &[&Lecture]) {
+        for lecture in lectures {
+            println!("{}", lecture.title);
+            println!("{}", lecture.url);
+            if let Some(c) = &lecture.categories {
+                for (module, categories) in c {
+                    println!("> {}", module);
+                    for category in categories {
+                        println!("\t {}", category);
+                    }
                 }
             }
+            println!("--------------");
         }
-        println!("--------------");
+    }
+
+    const NAME_LENGTH: usize = 12;
+
+    pub fn print_command_header(command: &Command) {
+        let mut name = command.name.to_owned().add("                    ");
+        name.truncate(NAME_LENGTH);
+        println!("{} {}", name, command.help)
+    }
+
+    pub fn print_command_args(command: &Command) {
+        let mut spacing = String::from(" ");
+        for _ in 0..NAME_LENGTH {
+            spacing.add_assign(" ");
+        }
+
+        if let Some(arg) = command.arguments.first() {
+            print!("{}ARGS:", spacing);
+            println!(" {}\t{}", arg.0, arg.1);
+        }
+        if command.arguments.len() > 1 {
+            for arg in &command.arguments[1..] {
+                println!("      {}{}\t{}", spacing, arg.0, arg.1);
+            }
+        }
+        println!();
     }
 }
