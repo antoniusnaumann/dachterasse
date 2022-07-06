@@ -1,14 +1,15 @@
-use std::env;
+use std::{env, process};
+use std::error::Error;
 
 pub struct Command {
     name: String,
     help: String,
     arguments: Vec<(String, String)>,
-    method: fn(&[String])
+    method: fn(&[String]) -> Result<(), Box<dyn Error>>
 }
 
 impl Command {
-    fn new(name: &str, help: &str, method: fn(&[String])) -> Self {
+    fn new(name: &str, help: &str, method: fn(&[String]) -> Result<(), Box<dyn Error>>) -> Self {
         Command {
             name: String::from(name),
             help: String::from(help),
@@ -16,7 +17,7 @@ impl Command {
             method }
     }
 
-    fn new_with_args(name: &str, help: &str, arguments: &[(&str, &str)], method: fn(&[String])) -> Self {
+    fn new_with_args(name: &str, help: &str, arguments: &[(&str, &str)], method: fn(&[String])-> Result<(), Box<dyn Error>>) -> Self {
         Command {
             name: String::from(name),
             help: String::from(help),
@@ -24,8 +25,8 @@ impl Command {
             method }
     }
 
-    fn execute(&self, args: &[String]) {
-        (self.method)(args);
+    fn execute(&self, args: &[String]) -> Result<(), Box<dyn Error>> {
+        (self.method)(args)
     }
 }
 
@@ -37,6 +38,8 @@ fn commands() -> Vec<Command> {
         Command::new_with_args("init", "Initially scrapes the HPI lecture website.", &[config_arg],init_client),
         Command::new_with_args("overview", "Displays titles for all cached lectures. Please call dachterasse init before.", &[config_arg],show_overview),
         Command::new_with_args("all", "Shows details for all cached lectures. Please call dachterasse init before.", &[config_arg],show_details),
+        // TODO: Add command for filtering by name, module, category
+        // TODO: Add command to show all modules
     ]
 }
 
@@ -47,35 +50,48 @@ fn main() {
 
     if let Some(argument) = args.get(1) {
         if let Some(cmd) = cmds.iter().find(|cmd| cmd.name.eq_ignore_ascii_case(argument)) {
-            cmd.execute(&args[1..]);
+            cmd.execute(&args[1..]).unwrap_or_else(|error| {
+                println!("An error occured while executing 'dachterasse {}': {}", cmd.name, error);
+                process::exit(1);
+            });
             return;
         }
     }
 
-    print_help(&args[1..])
+    let _ = print_help(&args[1..]);
 }
 
 use commands::*;
 mod commands {
     use crate::*;
 
-    pub fn print_help(_: &[String]) {
+    pub fn print_help(_: &[String]) -> Result<(), Box<dyn Error>> {
         for cmd in commands() {
             print_command_header(&cmd);
             print_command_args(&cmd);
         }
+
+        Ok(())
     }
 
-    pub fn init_client(args: &[String]) {
-        client_with_config_args(args).init()
+    pub fn init_client(args: &[String]) -> Result<(), Box<dyn Error>> {
+        println!("Loading lectures...");
+        client_with_config_args(args).init()?;
+        println!("Finished!");
+
+        Ok(())
     }
 
-    pub fn show_overview(args: &[String]) {
+    pub fn show_overview(args: &[String]) -> Result<(), Box<dyn Error>> {
         print_lectures(&client_with_config_args(args).all_lectures());
+
+        Ok(())
     }
 
-    pub fn show_details(args: &[String]) {
+    pub fn show_details(args: &[String]) -> Result<(), Box<dyn Error>> {
         print_lectures_detailed(&client_with_config_args(args).all_lectures());
+
+        Ok(())
     }
 }
 

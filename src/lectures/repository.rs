@@ -6,6 +6,8 @@ use serde::{Serialize, Deserialize};
 use super::entities::Lecture;
 use super::scrape::LectureScraper;
 
+pub use super::scrape::Error;
+
 #[derive(Default, Serialize, Deserialize)]
 struct LectureCache {
     lectures: Vec<Lecture>
@@ -36,12 +38,12 @@ impl LectureRepository {
 
     /// Getter method for lazily loading lectures from scraper.
     /// Subsequent method calls return cached lectures.
-    pub fn load_lectures(&mut self) -> &[Lecture] {
+    pub fn load_lectures(&mut self) -> Result<&[Lecture], Error> {
         if self.cache.lectures.is_empty() {
-            self.cache.lectures = self.scraper.fetch_lecture_details(None)
+            self.cache.lectures = self.scraper.fetch_lecture_details(None)?
         }
 
-        &self.cache.lectures
+        Ok(&self.cache.lectures)
     }
 
     /// Attempts to load cached lecture information from a JSON file

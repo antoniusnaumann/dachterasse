@@ -1,10 +1,8 @@
 use reqwest::blocking::Client;
 
-pub fn unsafe_get(url: &str, client: &Client) -> String {
+pub fn get_text(url: &str, client: &Client) -> Result<String, reqwest::Error> {
     client
         .get(url)
-        .send()
-        .unwrap()
+        .send()?
         .text()
-        .unwrap()
 }

@@ -3,7 +3,7 @@ use regex::Regex;
 use reqwest::blocking::Client;
 use scraper::{Html, Selector};
 use scraper::element_ref::Text;
-use super::load::unsafe_get;
+use super::load::get_text;
 use super::entities::Lecture;
 
 // TODO: Build lecture scraper which also follows links and scrapes categories
@@ -12,21 +12,23 @@ pub struct LectureScraper {
     client: Client
 }
 
+pub type Error = reqwest::Error;
+
 impl LectureScraper {
     pub fn new() -> Self {
         LectureScraper { client: Client::new() }
     }
 
     // TODO: Extract document fetching and parsing into separate method for better testability
-    pub fn fetch_lectures(&self) -> Vec<Lecture> {
+    pub fn fetch_lectures(&self) -> Result<Vec<Lecture>, Error> {
         // TODO: Extract URL to enum for different degree tracks
         let url = "https://hpi.de/studium/im-studium/lehrveranstaltungen/it-systems-engineering-ma.html";
-        let document = unsafe_get(url, &self.client);
+        let document = get_text(url, &self.client)?;
         let fragment = Html::parse_document(&document);
         let selector = Selector::parse("a.courselink").unwrap();
         let link_regex = Regex::new(r"/studium.*\.html").unwrap();
 
-        fragment.select(&selector)
+        Ok(fragment.select(&selector)
             .map(|element| {
                 Lecture {
                     title: clean(element.text()),
@@ -34,16 +36,16 @@ impl LectureScraper {
                     categories: None
                 }
             })
-            .collect()
+            .collect())
     }
 
     // TODO: Extract document fetching and parsing into separate method for better testability
-    pub fn fetch_lecture_details(&self, lectures: Option<Vec<Lecture>>) -> Vec<Lecture> {
-        let mut lectures = if let Some(vector) = lectures { vector } else { self.fetch_lectures() };
+    pub fn fetch_lecture_details(&self, lectures: Option<Vec<Lecture>>) -> Result<Vec<Lecture>, Error> {
+        let mut lectures = if let Some(vector) = lectures { vector } else { self.fetch_lectures()? };
 
         for mut lecture in &mut lectures {
             // TODO: Do asynchronously
-            let document = unsafe_get(&lecture.url, &self.client);
+            let document = get_text(&lecture.url, &self.client)?;
 
             if let Some(inner_fragment) = self.scrape_modules(document.as_str(), "IT-Systems Engineering MA") {
                 let module_list = Html::parse_fragment(inner_fragment.as_str());
@@ -67,7 +69,7 @@ impl LectureScraper {
             }
         }
 
-        lectures
+        Ok(lectures)
     }
 
     fn scrape_modules(&self, document: &str, degree: &str) -> Option<String> {

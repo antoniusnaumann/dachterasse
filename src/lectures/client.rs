@@ -3,6 +3,8 @@ use super::repository::LectureRepository;
 use super::entities::Lecture;
 use super::config::Config;
 
+pub use super::scrape::Error;
+
 pub struct LectureClient {
     repository: LectureRepository,
     config: Config
@@ -13,7 +15,9 @@ impl LectureClient {
         let mut client = LectureClient { repository: LectureRepository::new(), config };
         if let Some(path) = client.config.get_cache_path() {
             if let Err(e) = client.repository.load_cache(&path) {
+                // TODO: Add verbose tag
                 eprintln!("Could not load cache: {}", e);
+                println!("New cache will be created later...")
             }
         }
         client
@@ -21,16 +25,16 @@ impl LectureClient {
 
     // TODO: Make this return a result if loading was successful
     /// Triggers initial load for repository data. Should be called before accessing any lecture data.
-    pub fn init(&mut self) {
-        let _ = self.repository.load_lectures();
+    pub fn init(&mut self) -> Result<&[Lecture], Error> {
+        self.repository.load_lectures()
     }
 
     // TODO: This could be ensured by providing client only through interfaces,
     // TODO: e.g. UnitializedClient and Client. Could also be called in constructor instead but that hides a potentially costly operation
-    /// Calls [init] and returns self
-    pub fn initialized(mut self) -> Self {
-        self.init();
-        self
+    /// Calls [init] and returns self if init was successful
+    pub fn initialized(mut self) -> Result<Self, Error> {
+        self.init()?;
+        Ok(self)
     }
 
     /// Returns lectures from repository. Can return an empty slice if no lectures were loaded yet
@@ -97,7 +101,7 @@ impl LectureClient {
 impl Drop for LectureClient {
     fn drop(&mut self) {
         if let Some(path) = self.config.get_cache_path() {
-            if let Err(e) = self.repository.save_cache(&path.to_string()) {
+            if let Err(e) = self.repository.save_cache(path) {
                 eprintln!("Could not save cache: {}", e);
             }
         }
