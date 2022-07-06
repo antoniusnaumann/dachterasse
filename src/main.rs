@@ -1,15 +1,17 @@
 use std::{env, process};
 use std::error::Error;
 
+type Execute = fn(&[String]) -> Result<(), Box<dyn Error>>;
+
 pub struct Command {
     name: String,
     help: String,
     arguments: Vec<(String, String)>,
-    method: fn(&[String]) -> Result<(), Box<dyn Error>>
+    method: Execute
 }
 
 impl Command {
-    fn new(name: &str, help: &str, method: fn(&[String]) -> Result<(), Box<dyn Error>>) -> Self {
+    fn new(name: &str, help: &str, method: Execute) -> Self {
         Command {
             name: String::from(name),
             help: String::from(help),
@@ -17,7 +19,7 @@ impl Command {
             method }
     }
 
-    fn new_with_args(name: &str, help: &str, arguments: &[(&str, &str)], method: fn(&[String])-> Result<(), Box<dyn Error>>) -> Self {
+    fn new_with_args(name: &str, help: &str, arguments: &[(&str, &str)], method: Execute) -> Self {
         Command {
             name: String::from(name),
             help: String::from(help),
