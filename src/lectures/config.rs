@@ -10,9 +10,9 @@ impl Config {
         Config { cache_path: None }
     }
 
-    /// Create a config with the default cache path `/cache/lecture_cache.json`
+    /// Create a config with the default cache path `/cache/<degree_id>.json`
     pub fn with_cache() -> Self {
-        Config::new().cache_path("cache/lecture_cache.json".to_string())
+        Config::new().cache_path("cache".to_string())
     }
 
     /// Set the cache path for this config

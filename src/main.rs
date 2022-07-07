@@ -41,7 +41,6 @@ fn commands() -> Vec<Command> {
         Command::new_with_args("overview", "Displays titles for all cached lectures. Please call dachterasse init before.", &[config_arg],show_overview),
         Command::new_with_args("all", "Shows details for all cached lectures. Please call dachterasse init before.", &[config_arg],show_details),
         // TODO: Add command for filtering by name, module, category
-        // TODO: Add command to show all modules
     ]
 }
 
@@ -65,6 +64,7 @@ fn main() {
 
 use commands::*;
 mod commands {
+    use dachterasse::Degrees;
     use crate::*;
 
     pub fn print_help(_: &[String]) -> Result<(), Box<dyn Error>> {
@@ -85,13 +85,15 @@ mod commands {
     }
 
     pub fn show_overview(args: &[String]) -> Result<(), Box<dyn Error>> {
-        print_lectures(&client_with_config_args(args).all_lectures());
+        // TODO: Support selecting a degree instead of hardcoding ITSE_MA here
+        print_lectures(&client_with_config_args(args).all_lectures(&Degrees::ITSE_MA));
 
         Ok(())
     }
 
     pub fn show_details(args: &[String]) -> Result<(), Box<dyn Error>> {
-        print_lectures_detailed(&client_with_config_args(args).all_lectures());
+        // TODO: Support selecting a degree instead of hardcoding ITSE_MA here
+        print_lectures_detailed(&client_with_config_args(args).all_lectures(&Degrees::ITSE_MA));
 
         Ok(())
     }

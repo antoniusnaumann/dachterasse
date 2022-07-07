@@ -19,5 +19,6 @@ mod lectures {
 pub use crate::lectures::client::LectureClient;
 pub use crate::lectures::config::Config;
 pub use crate::lectures::entities::Lecture;
+pub use crate::lectures::entities::Degrees;
 
 pub use crate::lectures::repository as repository;
