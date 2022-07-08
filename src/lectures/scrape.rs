@@ -45,7 +45,7 @@ impl LectureScraper {
             // TODO: Do asynchronously
             let document = get_text(&lecture.url, &self.client)?;
 
-            if let Some(inner_fragment) = self.scrape_modules(document.as_str(), "IT-Systems Engineering MA") {
+            if let Some(inner_fragment) = self.scrape_modules(document.as_str(), degree.id) {
                 let module_list = Html::parse_fragment(inner_fragment.as_str());
                 let item_selector = Selector::parse("li").unwrap();
                 let categories: Vec<(String, Vec<String>)> = module_list.select(&item_selector)

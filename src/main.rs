@@ -64,7 +64,6 @@ fn main() {
 
 use commands::*;
 mod commands {
-    use dachterasse::Degrees;
     use crate::*;
 
     pub fn print_help(_: &[String]) -> Result<(), Box<dyn Error>> {
@@ -85,15 +84,15 @@ mod commands {
     }
 
     pub fn show_overview(args: &[String]) -> Result<(), Box<dyn Error>> {
-        // TODO: Support selecting a degree instead of hardcoding ITSE_MA here
-        print_lectures(&client_with_config_args(args).all_lectures(&Degrees::ITSE_MA));
+        let degree = prompt_degree();
+        print_lectures(&client_with_config_args(args).all_lectures(degree));
 
         Ok(())
     }
 
     pub fn show_details(args: &[String]) -> Result<(), Box<dyn Error>> {
-        // TODO: Support selecting a degree instead of hardcoding ITSE_MA here
-        print_lectures_detailed(&client_with_config_args(args).all_lectures(&Degrees::ITSE_MA));
+        let degree = prompt_degree();
+        print_lectures_detailed(&client_with_config_args(args).all_lectures(degree));
 
         Ok(())
     }
@@ -101,8 +100,9 @@ mod commands {
 
 use helpers::*;
 mod helpers {
+    use std::io;
     use std::ops::{Add, AddAssign};
-    use dachterasse::{Config, Lecture, LectureClient};
+    use dachterasse::{Config, Degree, Degrees, Lecture, LectureClient};
     use crate::*;
 
     pub fn client_with_config_args(args: &[String]) -> LectureClient {
@@ -133,6 +133,27 @@ mod helpers {
             }
             println!("--------------");
         }
+    }
+
+    pub fn prompt_degree() -> &'static Degree {
+        println!("Degrees\n");
+
+        let degrees = Degrees::all();
+        for index in 0..degrees.len() {
+            println!("{} ({})", degrees[index].id, index);
+        }
+
+        println!("\nPlease choose your degree (0 - {}):", degrees.len() - 1);
+
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .unwrap();
+        let input: usize = input.trim()
+            .parse()
+            .expect("Please enter a valid index");
+
+        &degrees[input]
     }
 
     const NAME_LENGTH: usize = 12;
