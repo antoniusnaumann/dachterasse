@@ -114,12 +114,20 @@ mod helpers {
     }
 
     pub fn print_lectures(lectures: &[&Lecture]) {
+        if lectures.is_empty() {
+            println!("\nNo lectures found. Try to run 'dachterasse init'.")
+        }
+
         for lecture in lectures {
             println!("{}", lecture.title);
         }
     }
 
     pub fn print_lectures_detailed(lectures: &[&Lecture]) {
+        if lectures.is_empty() {
+            println!("\nNo lectures found. Try to run 'dachterasse init'.")
+        }
+
         for lecture in lectures {
             println!("{}", lecture.title);
             println!("{}", lecture.url);

@@ -1,23 +1,24 @@
 use crate::lectures::entities::{Degree, Degrees};
-use super::repository::LectureRepository;
+use crate::repository::LectureRepository;
+use super::repository::FSLectureRepository;
 use super::entities::Lecture;
 use super::config::Config;
 
 pub use super::scrape::Error;
 
 pub struct LectureClient {
-    repository: LectureRepository,
+    repository: FSLectureRepository,
     config: Config
 }
 
 impl LectureClient {
     pub fn with_config(config: Config) -> Self {
-        let mut client = LectureClient { repository: LectureRepository::new(), config };
+        let mut client = LectureClient { repository: FSLectureRepository::new(), config };
         if let Some(path) = client.config.get_cache_path() {
-            for result in client.repository.load_caches(&path) {
-                if let Err(e) = result {
-                    eprintln!("Could not load cache: \"{}\"", e);
-                    println!("New cache will be created later...")
+            if let Err(e) = client.repository.load_cache(&path) {
+                for error in e {
+                    eprintln!("Could not load cache: \"{}\"", error);
+                    println!("New cache will be created later...");
                 }
             }
         }
@@ -71,9 +72,9 @@ impl LectureClient {
 impl Drop for LectureClient {
     fn drop(&mut self) {
         if let Some(path) = self.config.get_cache_path() {
-            for result in self.repository.save_caches(path) {
-                if let Err(e) = result {
-                    eprintln!("Could not save cache: {}", e);
+            if let Err(e) = self.repository.save_cache(&path) {
+                for error in e {
+                    eprintln!("Could not save cache: \"{}\"", error);
                 }
             }
         }
