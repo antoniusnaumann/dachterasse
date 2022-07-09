@@ -28,7 +28,7 @@ impl LectureClient {
     pub fn init(&mut self) -> Result<(), Error> {
         for degree in Degrees::all() {
             // TODO: Verbose tag
-            println!("Loading lectures for degree {}...", degree.id);
+            println!("Loading lectures for degree {}...", degree.name);
             // TODO: Aggregate errors
             self.load(degree)?;
         }

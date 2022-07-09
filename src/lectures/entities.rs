@@ -34,12 +34,12 @@ pub enum Language {
 }
 
 pub struct Degree {
+    /// The section headline string as found in the module overview for a lecture
     pub name: &'static str,
     pub level: DegreeLevel,
     /// Lecture overview site URL for this degree
     pub url: &'static str,
     pub language: Language,
-    /// The section headline string as found in the module overview for a lecture. Must be unique.
     pub id: &'static str,
 }
 
@@ -60,39 +60,39 @@ impl Hash for Degree {
 pub struct Degrees { #[allow(dead_code)] no_instance: () }
 impl Degrees {
     pub const ITSE_BA: Degree = Degree {
-        name: "IT-Systems Engineering",
+        name: "IT-Systems Engineering BA",
         level: DegreeLevel::Bachelor,
         language: Language::German,
         url: "https://hpi.de/studium/im-studium/lehrveranstaltungen/it-systems-engineering-ba.html",
-        id: "IT-Systems Engineering BA",
+        id: "itse-ba",
     };
     pub const ITSE_MA: Degree = Degree {
-        name: "IT-Systems Engineering",
+        name: "IT-Systems Engineering MA",
         level: DegreeLevel::Master,
         language: Language::German,
         url:"https://hpi.de/studium/im-studium/lehrveranstaltungen/it-systems-engineering-ma.html",
-        id: "IT-Systems Engineering MA",
+        id: "itse-ma",
     };
     pub const DE_MA: Degree = Degree {
-        name: "Data Engineering",
+        name: "Data Engineering MA",
         level: DegreeLevel::Master,
         language: Language::German,
         url: "https://hpi.de/studium/im-studium/lehrveranstaltungen/data-engineering-ma.html",
-        id: "Data Engineering MA",
+        id: "de-ma",
     };
     pub const DH_MA: Degree = Degree {
-        name: "Digital Health",
+        name: "Digital Health MA",
         level: DegreeLevel::Master,
         language: Language::English,
         url: "https://hpi.de/studium/im-studium/lehrveranstaltungen/digital-health-ma.html",
-        id: "Digital Health MA",
+        id: "dh-ma",
     };
     pub const CS_MA: Degree = Degree {
-        name: "Cybersecurity",
+        name: "Cybersecurity MA",
         level: DegreeLevel::Master,
         language: Language::English,
         url: "https://hpi.de/studium/im-studium/lehrveranstaltungen/cybersecurity-ma.html",
-        id: "Cybersecurity MA",
+        id: "cs-ma",
     };
     pub const SSE_MA: Degree = Degree {
         name: "Software Systems Engineering",

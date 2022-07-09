@@ -148,7 +148,7 @@ mod helpers {
 
         let degrees = Degrees::all();
         for index in 0..degrees.len() {
-            println!("{} ({})", degrees[index].id, index);
+            println!("{} ({})", degrees[index].name, index);
         }
 
         println!("\nPlease choose your degree (0 - {}):", degrees.len() - 1);
