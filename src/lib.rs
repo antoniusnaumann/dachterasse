@@ -23,3 +23,4 @@ pub use crate::lectures::entities::Degrees;
 pub use crate::lectures::entities::Degree;
 
 pub use crate::lectures::repository as repository;
+pub use crate::lectures::scrape as scrape;
