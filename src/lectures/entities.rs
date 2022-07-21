@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
-#[derive(Serialize, Deserialize, Eq, Debug)]
+#[derive(Serialize, Deserialize, Eq, Debug, Clone)]
 pub struct Lecture {
     pub title: String,
     pub url: String,

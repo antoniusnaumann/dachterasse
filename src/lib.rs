@@ -15,8 +15,13 @@ mod lectures {
     pub mod scrape;
 
     pub mod datasource;
-    pub mod cache;
     pub mod repository;
+
+    pub mod sources {
+        pub mod filesystem_source;
+        pub mod scraper_source;
+        pub mod memory_source;
+    }
 
     pub mod config;
     pub mod client;
@@ -29,4 +34,6 @@ pub use crate::lectures::entities::Degrees;
 pub use crate::lectures::entities::Degree;
 
 pub use crate::lectures::datasource as datasource;
-pub use crate::lectures::repository as repository;pub use crate::lectures::scrape as scrape;
+pub use crate::lectures::repository as repository;
+pub use crate::lectures::scrape as scrape;
+pub use crate::lectures::sources as sources;

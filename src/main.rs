@@ -76,14 +76,14 @@ mod commands {
 
     pub fn show_overview(args: &[String]) -> Result<(), Box<dyn Error>> {
         let degree = prompt_degree();
-        print_lectures(client_with_config_args(args).load_lectures(degree)?);
+        print_lectures(client_with_config_args(args).lectures(degree));
 
         Ok(())
     }
 
     pub fn show_details(args: &[String]) -> Result<(), Box<dyn Error>> {
         let degree = prompt_degree();
-        print_lectures_detailed(client_with_config_args(args).load_lectures(degree)?);
+        print_lectures_detailed(client_with_config_args(args).lectures(degree));
 
         Ok(())
     }
@@ -98,9 +98,9 @@ mod helpers {
 
     pub fn client_with_config_args(args: &[String]) -> LectureClient {
         if args.len() >= 3 && args[1] == "--config" {
-            LectureClient::from_config(Config::new().cache_path(args[1].clone()))
+            LectureClient::from_config(Config::new().cache_path(args[1].clone())).initialized()
         } else {
-            LectureClient::from_config(Config::with_cache())
+            LectureClient::from_config(Config::with_cache()).initialized()
         }
     }
 

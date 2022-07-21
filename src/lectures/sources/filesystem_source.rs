@@ -2,23 +2,22 @@ use std::fs::File;
 use std::{fs, io};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use crate::{Degree, Lecture};
-use crate::datasource::{LectureDataSource, LoadResult, ReadDataSource, SaveResult, WriteDataSource};
+use crate::{Degree, Degrees, Lecture};
+use crate::datasource::{LoadResult, SaveResult, ReadWriteDataSource, ReadOnlyDataSource};
 
 pub struct FSDataSource {
-    base_path: String,
     caches: HashMap<&'static Degree, FileSystemCache>
 }
 
-impl ReadDataSource for FSDataSource {
-    fn load_lectures(&mut self, degree: &'static Degree) -> LoadResult {
+impl ReadOnlyDataSource for FSDataSource {
+    fn load_lectures(&self, degree: &'static Degree) -> LoadResult {
         self.cache_for_degree(degree)
             .load_lectures()
             .map_err(|err| format!("Could not load cache for degree {} due to {}", degree.id, err))
     }
 }
 
-impl WriteDataSource for FSDataSource {
+impl ReadWriteDataSource for FSDataSource {
     fn save_lectures(&mut self, degree: &'static Degree, lectures: &[Lecture]) -> SaveResult {
         self.cache_for_degree(degree)
             .save_lectures(lectures)
@@ -26,17 +25,19 @@ impl WriteDataSource for FSDataSource {
     }
 }
 
-impl LectureDataSource for FSDataSource { }
-
 impl FSDataSource {
     pub fn new(path: String) -> Self {
-        FSDataSource { base_path: path, caches: HashMap::new() }
+        let mut caches = HashMap::new();
+
+        for degree in Degrees::all() {
+            caches.insert(degree, FileSystemCache { path: Path::join(path.as_ref(), degree.id)});
+        }
+
+        FSDataSource { caches }
     }
 
-    fn cache_for_degree(&mut self, degree: &'static Degree) -> &FileSystemCache {
-        self.caches
-            .entry(degree)
-            .or_insert(FileSystemCache { path: Path::join(self.base_path.as_ref(), degree.id)})
+    fn cache_for_degree(&self, degree: &'static Degree) -> &FileSystemCache {
+        &self.caches[degree]
     }
 }
 
