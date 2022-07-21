@@ -4,7 +4,6 @@ use reqwest::blocking::Client;
 use scraper::{Html, Selector};
 use scraper::element_ref::Text;
 use crate::lectures::entities::Degree;
-use super::load::get_text;
 use super::entities::Lecture;
 
 #[derive(Default)]
@@ -94,4 +93,11 @@ fn clean_str(text: Text) -> &str {
         .first()
         .unwrap()
         .trim()
+}
+
+fn get_text(url: &str, client: &Client) -> Result<String, reqwest::Error> {
+    client
+        .get(url)
+        .send()?
+        .text()
 }

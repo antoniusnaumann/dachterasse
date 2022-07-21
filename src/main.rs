@@ -37,7 +37,6 @@ fn commands() -> Vec<Command> {
 
     vec![
         Command::new("help", "Prints out this help page",print_help),
-        Command::new_with_args("init", "Initially scrapes the HPI lecture website.", &[config_arg],init_client),
         Command::new_with_args("overview", "Displays titles for all cached lectures. Please call dachterasse init before.", &[config_arg],show_overview),
         Command::new_with_args("all", "Shows details for all cached lectures. Please call dachterasse init before.", &[config_arg],show_details),
         // TODO: Add command for filtering by name, module, category
@@ -75,24 +74,16 @@ mod commands {
         Ok(())
     }
 
-    pub fn init_client(args: &[String]) -> Result<(), Box<dyn Error>> {
-        println!("Loading lectures...");
-        client_with_config_args(args).init()?;
-        println!("Finished!");
-
-        Ok(())
-    }
-
     pub fn show_overview(args: &[String]) -> Result<(), Box<dyn Error>> {
         let degree = prompt_degree();
-        print_lectures(&client_with_config_args(args).all_lectures(degree));
+        print_lectures(client_with_config_args(args).load_lectures(degree)?);
 
         Ok(())
     }
 
     pub fn show_details(args: &[String]) -> Result<(), Box<dyn Error>> {
         let degree = prompt_degree();
-        print_lectures_detailed(&client_with_config_args(args).all_lectures(degree));
+        print_lectures_detailed(client_with_config_args(args).load_lectures(degree)?);
 
         Ok(())
     }
@@ -107,13 +98,13 @@ mod helpers {
 
     pub fn client_with_config_args(args: &[String]) -> LectureClient {
         if args.len() >= 3 && args[1] == "--config" {
-            LectureClient::with_config(Config::new().cache_path(args[1].clone()))
+            LectureClient::from_config(Config::new().cache_path(args[1].clone()))
         } else {
-            LectureClient::with_config(Config::with_cache())
+            LectureClient::from_config(Config::with_cache())
         }
     }
 
-    pub fn print_lectures(lectures: &[&Lecture]) {
+    pub fn print_lectures(lectures: &[Lecture]) {
         if lectures.is_empty() {
             println!("\nNo lectures found. Try to run 'dachterasse init'.")
         }
@@ -123,7 +114,7 @@ mod helpers {
         }
     }
 
-    pub fn print_lectures_detailed(lectures: &[&Lecture]) {
+    pub fn print_lectures_detailed(lectures: &[Lecture]) {
         if lectures.is_empty() {
             println!("\nNo lectures found. Try to run 'dachterasse init'.")
         }
@@ -147,8 +138,8 @@ mod helpers {
         println!("Degrees\n");
 
         let degrees = Degrees::all();
-        for index in 0..degrees.len() {
-            println!("{} ({})", degrees[index].name, index);
+        for (index, degree) in degrees.iter().enumerate() {
+            println!("{} ({})", degree.name, index);
         }
 
         println!("\nPlease choose your degree (0 - {}):", degrees.len() - 1);

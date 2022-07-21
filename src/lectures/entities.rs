@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
-use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Eq, Debug)]
 pub struct Lecture {
