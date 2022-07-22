@@ -2,6 +2,7 @@ use crate::datasource::{LoadResult, ReadOnlyDataSource};
 use crate::Degree;
 use crate::scrape::LectureScraper;
 
+#[derive(Default)]
 pub struct ScraperSource {
     scraper: LectureScraper
 }
