@@ -31,7 +31,7 @@ mod lectures {
     pub mod config;
 }
 
-mod asynch {
+pub mod asynch {
     pub mod lectures {
         pub mod scrape;
 
