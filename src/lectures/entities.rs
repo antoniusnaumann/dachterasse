@@ -21,17 +21,20 @@ impl Hash for Lecture {
     }
 }
 
+#[derive(Serialize)]
 pub enum DegreeLevel {
     Bachelor,
-    Master
+    Master,
 }
 
 // TODO: Serialize to commonly used language abbreviations
+#[derive(Serialize)]
 pub enum Language {
     German,
-    English
+    English,
 }
 
+#[derive(Serialize)]
 pub struct Degree {
     /// The section headline string as found in the module overview for a lecture
     pub name: &'static str,
@@ -48,7 +51,7 @@ impl PartialEq for Degree {
     }
 }
 
-impl Eq for Degree { }
+impl Eq for Degree {}
 
 impl Hash for Degree {
     fn hash<H: Hasher>(&self, state: &mut H) {
@@ -56,7 +59,10 @@ impl Hash for Degree {
     }
 }
 
-pub struct Degrees { #[allow(dead_code)] no_instance: () }
+pub struct Degrees {
+    #[allow(dead_code)]
+    no_instance: (),
+}
 impl Degrees {
     pub const ITSE_BA: Degree = Degree {
         name: "IT-Systems Engineering BA",
@@ -69,7 +75,7 @@ impl Degrees {
         name: "IT-Systems Engineering MA",
         level: DegreeLevel::Master,
         language: Language::German,
-        url:"https://hpi.de/studium/im-studium/lehrveranstaltungen/it-systems-engineering-ma.html",
+        url: "https://hpi.de/studium/im-studium/lehrveranstaltungen/it-systems-engineering-ma.html",
         id: "itse-ma",
     };
     pub const DE_MA: Degree = Degree {
@@ -110,7 +116,7 @@ impl Degrees {
         // Self::SSE_MA
     ];
 
-    pub fn all() -> &'static [Degree]{
+    pub fn all() -> &'static [Degree] {
         Self::DEGREES
     }
 }
