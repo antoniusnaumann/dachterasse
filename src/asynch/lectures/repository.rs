@@ -1,7 +1,10 @@
-use crate::datasource::{Error, ReadOnlyDataSource, ReadWriteDataSource};
+use futures::stream;
+use futures::stream::StreamExt;
+
+use crate::asynch::datasource::{Error, ReadOnlyDataSource, ReadWriteDataSource};
 use crate::lectures::entities::Degree;
 
-use super::entities::Lecture;
+use crate::lectures::entities::Lecture;
 
 /// A lecture repository which is responsible for keeping lecture information in sync across multiple data sources
 #[derive(Default)]
@@ -48,8 +51,11 @@ impl<'a> LectureRepository<'a> {
     }
 
     /// Load lectures from repository data sources and write them to read-write sources
-    pub fn synchronized_load(&mut self, degree: &'static Degree) -> Result<Vec<Lecture>, Error> {
-        match self.try_loading(degree) {
+    pub async fn synchronized_load(
+        &mut self,
+        degree: &'static Degree,
+    ) -> Result<Vec<Lecture>, Error> {
+        match self.try_loading(degree).await {
             Some(lectures) => {
                 for rw in &mut self.sources {
                     let _ = rw.save_lectures(degree, &lectures);
@@ -63,17 +69,21 @@ impl<'a> LectureRepository<'a> {
         }
     }
 
-    fn try_loading(&self, degree: &'static Degree) -> Option<Vec<Lecture>> {
-        self.sources
-            .iter()
-            .find_map(|source| source.load_lectures(degree).ok())
-            .map_or_else(
-                || {
-                    self.read_only_sources
-                        .iter()
-                        .find_map(|source| source.load_lectures(degree).ok())
-                },
-                Some,
-            )
+    async fn try_loading(&self, degree: &'static Degree) -> Option<Vec<Lecture>> {
+        for source in &self.sources {
+            match source.load_lectures(degree).await {
+                Ok(result) => return Some(result),
+                Err(_) => continue,
+            }
+        }
+
+        for source in &self.read_only_sources {
+            match source.load_lectures(degree).await {
+                Ok(result) => return Some(result),
+                Err(_) => continue,
+            }
+        }
+
+        None
     }
 }

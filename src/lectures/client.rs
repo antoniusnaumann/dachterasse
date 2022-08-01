@@ -1,19 +1,18 @@
-use std::collections::HashMap;
+use super::config::Config;
+use super::entities::Lecture;
 use crate::datasource::Error;
-use crate::Degrees;
 use crate::lectures::entities::Degree;
 use crate::repository::LectureRepository;
-use crate::sources::filesystem_source::FSDataSource;
-use crate::sources::scraper_source::ScraperSource;
-use super::entities::Lecture;
-use super::config::Config;
+use crate::sources::*;
+use crate::Degrees;
+use std::collections::HashMap;
 
 pub struct LectureClient<'a> {
     repository: LectureRepository<'a>,
     lectures: HashMap<&'static Degree, Vec<Lecture>>,
 }
 
-impl <'a> LectureClient <'a> {
+impl<'a> LectureClient<'a> {
     pub fn from_config(config: Config) -> Self {
         let mut repository = LectureRepository::new();
         if let Some(path) = config.get_cache_path() {
@@ -25,11 +24,14 @@ impl <'a> LectureClient <'a> {
         for degree in Degrees::all() {
             lectures.insert(degree, Vec::new());
         }
-        LectureClient { repository, lectures }
+        LectureClient {
+            repository,
+            lectures,
+        }
     }
 
     /// Call after creating LectureClient to ensure lectures were loaded
-    pub fn init(&mut self) -> Result<(), Error>{
+    pub fn init(&mut self) -> Result<(), Error> {
         for degree in Degrees::all() {
             self.load_lectures(degree)?;
         }
@@ -47,7 +49,8 @@ impl <'a> LectureClient <'a> {
     }
 
     fn load_lectures(&mut self, degree: &'static Degree) -> Result<&[Lecture], Error> {
-        self.lectures.insert(degree, self.repository.synchronized_load(degree)?);
+        self.lectures
+            .insert(degree, self.repository.synchronized_load(degree)?);
         Ok(&self.lectures[degree])
     }
 
@@ -56,14 +59,21 @@ impl <'a> LectureClient <'a> {
     /// # Arguments
     ///
     /// * `modules` - Search for all lectures matching any of the given module names literally
-    pub fn filter_lectures(&mut self, modules: Vec<&str>, degree: &'static Degree) -> Vec<&Lecture> {
+    pub fn filter_lectures(
+        &mut self,
+        modules: Vec<&str>,
+        degree: &'static Degree,
+    ) -> Vec<&Lecture> {
         // TODO: Error Handling
-        self.lectures[degree].iter()
+        self.lectures[degree]
+            .iter()
             .filter(|lecture| {
                 modules.iter().any(|&module| {
                     if let Some(c) = &lecture.categories {
                         c.contains_key(module)
-                    } else { false }
+                    } else {
+                        false
+                    }
                 })
             })
             .collect()

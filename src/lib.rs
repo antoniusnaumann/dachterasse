@@ -18,9 +18,9 @@ mod lectures {
     pub mod repository;
 
     pub mod sources {
-        pub mod filesystem_source;
-        pub mod memory_source;
-        pub mod scraper_source;
+        mod filesystem_source;
+        mod memory_source;
+        mod scraper_source;
 
         pub use filesystem_source::FSDataSource;
         pub use memory_source::InMemoryDataSource;
@@ -29,6 +29,24 @@ mod lectures {
 
     pub mod client;
     pub mod config;
+}
+
+mod asynch {
+    pub mod lectures {
+        pub mod scrape;
+
+        pub mod datasource;
+        pub mod repository;
+
+        pub mod sources {
+            mod memory_source;
+            mod scraper_source;
+
+            pub use memory_source::InMemoryDataSource;
+            pub use scraper_source::ScraperSource;
+        }
+    }
+    pub use lectures::*;
 }
 
 pub use crate::lectures::client::LectureClient;
