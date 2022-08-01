@@ -5,7 +5,7 @@ pub type Error = String;
 pub type LoadResult = Result<Vec<Lecture>, Error>;
 pub type SaveResult = Result<(), Error>;
 
-pub trait ReadOnlyDataSource {
+pub trait ReadOnlyDataSource: Send + Sync {
     fn load_lectures(&self, degree: &'static Degree) -> LoadResult;
 }
 
