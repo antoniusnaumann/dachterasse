@@ -58,7 +58,9 @@ impl<'a> LectureRepository<'a> {
         match self.try_loading(degree).await {
             Some(lectures) => {
                 for rw in &mut self.sources {
-                    let _ = rw.save_lectures(degree, &lectures);
+                    if let Err(e) = rw.save_lectures(degree, &lectures).await {
+                        eprintln!("Error saving lecture to some datasource with error: {}", e);
+                    }
                 }
                 Ok(lectures)
             }
