@@ -12,5 +12,5 @@ pub trait ReadOnlyDataSource: Send + Sync {
 
 #[async_trait]
 pub trait ReadWriteDataSource: ReadOnlyDataSource {
-    async fn save_lectures(&mut self, degree: &'static Degree, lectures: &[Lecture]) -> SaveResult;
+    async fn save_lectures(&self, degree: &'static Degree, lectures: &[Lecture]) -> SaveResult;
 }

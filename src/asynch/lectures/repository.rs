@@ -1,6 +1,3 @@
-use futures::stream;
-use futures::stream::StreamExt;
-
 use crate::asynch::datasource::{Error, ReadOnlyDataSource, ReadWriteDataSource};
 use crate::lectures::entities::Degree;
 
@@ -51,13 +48,10 @@ impl<'a> LectureRepository<'a> {
     }
 
     /// Load lectures from repository data sources and write them to read-write sources
-    pub async fn synchronized_load(
-        &mut self,
-        degree: &'static Degree,
-    ) -> Result<Vec<Lecture>, Error> {
+    pub async fn load_and_update(&self, degree: &'static Degree) -> Result<Vec<Lecture>, Error> {
         match self.try_loading(degree).await {
             Some(lectures) => {
-                for rw in &mut self.sources {
+                for rw in &self.sources {
                     if let Err(e) = rw.save_lectures(degree, &lectures).await {
                         eprintln!("Error saving lecture to some datasource with error: {}", e);
                     }
