@@ -1,5 +1,2 @@
-/target
-Cargo.lock
-.idea
-/cache
 .DS_Store
+/target

@@ -1,0 +1,6 @@
+/target
+/Cargo.lock
+Secrets.*
+.idea/
+*.iml
+.DS_Store
