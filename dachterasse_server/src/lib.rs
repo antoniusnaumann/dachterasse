@@ -3,8 +3,8 @@ extern crate rocket;
 #[macro_use]
 extern crate rocket_modules;
 
-use shuttle_service::ShuttleRocket;
-use sqlx::PgPool;
+use shuttle_service::{error::CustomError, ShuttleRocket};
+use sqlx::{Executor, PgPool};
 
 pub mod server;
 
@@ -12,5 +12,8 @@ mod database;
 
 #[shuttle_service::main]
 async fn init(#[shared::Postgres] pool: PgPool) -> ShuttleRocket {
+    pool.execute(include_str!("../schema.sql"))
+        .await
+        .map_err(CustomError::new)?;
     Ok(server::rocket(pool))
 }
