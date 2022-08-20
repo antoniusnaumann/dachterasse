@@ -12,11 +12,16 @@ extern crate serde;
 
 mod lectures {
     pub mod entities;
+
+    #[cfg(feature = "sync")]
     pub mod scrape;
 
+    #[cfg(feature = "sync")]
     pub mod datasource;
+    #[cfg(feature = "sync")]
     pub mod repository;
 
+    #[cfg(feature = "sync")]
     pub mod sources {
         mod filesystem_source;
         mod memory_source;
@@ -27,10 +32,13 @@ mod lectures {
         pub use scraper_source::ScraperSource;
     }
 
+    #[cfg(feature = "client")]
     pub mod client;
+    #[cfg(feature = "client")]
     pub mod config;
 }
 
+#[cfg(feature = "async")]
 pub mod asynch {
     pub mod lectures {
         pub mod scrape;
@@ -49,14 +57,20 @@ pub mod asynch {
     pub use lectures::*;
 }
 
+#[cfg(feature = "sync")]
 pub use crate::lectures::client::LectureClient;
+#[cfg(feature = "client")]
 pub use crate::lectures::config::Config;
 pub use crate::lectures::entities::Degree;
 pub use crate::lectures::entities::Degrees;
 pub use crate::lectures::entities::Lecture;
 pub use crate::lectures::entities::StaticDegree;
 
+#[cfg(feature = "client")]
 pub use crate::lectures::datasource;
+#[cfg(feature = "client")]
 pub use crate::lectures::repository;
+#[cfg(feature = "client")]
 pub use crate::lectures::scrape;
+#[cfg(feature = "client")]
 pub use crate::lectures::sources;
