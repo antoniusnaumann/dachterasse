@@ -2,14 +2,14 @@ use super::database::LectureDatabase;
 use dachterasse::{
     asynch::repository::LectureRepository,
     asynch::sources::{InMemoryDataSource, ScraperSource},
-    Degree,
+    StaticDegree,
 };
 use dachterasse::{Degrees, Lecture};
 use rocket::{serde::json::Json, State};
 use rocket::{Build, Rocket};
 use sqlx::PgPool;
 
-fn find_degree(id: &str) -> &'static Degree {
+fn find_degree(id: &str) -> &'static StaticDegree {
     Degrees::all()
         .iter()
         .find(|d| d.id == id)
@@ -37,12 +37,12 @@ mod degrees {
     use super::*;
 
     #[get("/")]
-    async fn all() -> Json<&'static [Degree]> {
+    async fn all() -> Json<&'static [StaticDegree]> {
         Json(Degrees::all())
     }
 
     #[get("/<degree>")]
-    async fn with_id(degree: &str) -> Json<&'static Degree> {
+    async fn with_id(degree: &str) -> Json<&'static StaticDegree> {
         Json(find_degree(degree))
     }
 }

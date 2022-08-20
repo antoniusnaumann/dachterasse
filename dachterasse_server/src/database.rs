@@ -1,7 +1,7 @@
 use dachterasse::asynch::datasource::{
     LoadResult, ReadOnlyDataSource, ReadWriteDataSource, SaveResult,
 };
-use dachterasse::Degree;
+use dachterasse::StaticDegree;
 use serde::Serialize;
 use sqlx::{FromRow, PgPool, Postgres, QueryBuilder};
 
@@ -24,7 +24,7 @@ impl LectureDatabase {
 
 #[async_trait]
 impl ReadOnlyDataSource for LectureDatabase {
-    async fn load_lectures(&self, degree: &'static Degree) -> LoadResult {
+    async fn load_lectures(&self, degree: &'static StaticDegree) -> LoadResult {
         let database_lectures: Vec<Lecture> =
             sqlx::query_as("SELECT * FROM lectures WHERE id = $1")
                 .bind(degree.id)
@@ -56,7 +56,7 @@ impl ReadOnlyDataSource for LectureDatabase {
 impl ReadWriteDataSource for LectureDatabase {
     async fn save_lectures(
         &self,
-        degree: &'static Degree,
+        degree: &'static StaticDegree,
         lectures: &[dachterasse::Lecture],
     ) -> SaveResult {
         let database_lectures = lectures.iter().map(|lecture| Lecture {

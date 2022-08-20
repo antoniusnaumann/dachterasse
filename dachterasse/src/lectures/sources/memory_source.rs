@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use crate::datasource::*;
-use crate::{Degree, Lecture};
+use crate::{StaticDegree, Lecture};
 
 #[derive(Default)]
 pub struct InMemoryDataSource {
-    lectures: HashMap<&'static Degree, Vec<Lecture>>,
+    lectures: HashMap<&'static StaticDegree, Vec<Lecture>>,
 }
 
 impl InMemoryDataSource {
@@ -14,7 +14,7 @@ impl InMemoryDataSource {
 }
 
 impl ReadOnlyDataSource for InMemoryDataSource {
-    fn load_lectures(&self, degree: &'static Degree) -> LoadResult {
+    fn load_lectures(&self, degree: &'static StaticDegree) -> LoadResult {
         self.lectures
             .get(degree)
             .cloned()
@@ -23,7 +23,7 @@ impl ReadOnlyDataSource for InMemoryDataSource {
 }
 
 impl ReadWriteDataSource for InMemoryDataSource {
-    fn save_lectures(&mut self, degree: &'static Degree, lectures: &[Lecture]) -> SaveResult {
+    fn save_lectures(&mut self, degree: &'static StaticDegree, lectures: &[Lecture]) -> SaveResult {
         self.lectures.insert(degree, Vec::from(lectures));
 
         Ok(())

@@ -1,4 +1,4 @@
-use crate::lectures::entities::Degree;
+use crate::lectures::entities::StaticDegree;
 use crate::lectures::entities::Lecture;
 use regex::Regex;
 use reqwest::Client;
@@ -21,7 +21,7 @@ impl LectureScraper {
     }
 
     // TODO: Extract document fetching and parsing into separate method for better testability
-    pub async fn fetch_lectures(&self, degree: &Degree) -> Result<Vec<Lecture>, Error> {
+    pub async fn fetch_lectures(&self, degree: &StaticDegree) -> Result<Vec<Lecture>, Error> {
         let url = degree.url;
         let document = get_text(url, &self.client).await?;
         let fragment = Html::parse_document(&document);
@@ -40,7 +40,7 @@ impl LectureScraper {
     }
 
     // TODO: Extract document fetching and parsing into separate method for better testability
-    pub async fn fetch_lecture_details(&self, degree: &Degree) -> Result<Vec<Lecture>, Error> {
+    pub async fn fetch_lecture_details(&self, degree: &StaticDegree) -> Result<Vec<Lecture>, Error> {
         let mut lectures = self.fetch_lectures(degree).await?;
         for mut lecture in &mut lectures {
             let document = get_text(&lecture.url, &self.client).await?;

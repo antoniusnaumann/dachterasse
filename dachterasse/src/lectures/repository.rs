@@ -1,5 +1,5 @@
 use crate::datasource::{Error, ReadOnlyDataSource, ReadWriteDataSource};
-use crate::lectures::entities::Degree;
+use crate::lectures::entities::StaticDegree;
 
 use super::entities::Lecture;
 
@@ -48,7 +48,7 @@ impl<'a> LectureRepository<'a> {
     }
 
     /// Load lectures from repository data sources and write them to read-write sources
-    pub fn synchronized_load(&mut self, degree: &'static Degree) -> Result<Vec<Lecture>, Error> {
+    pub fn synchronized_load(&mut self, degree: &'static StaticDegree) -> Result<Vec<Lecture>, Error> {
         match self.try_loading(degree) {
             Some(lectures) => {
                 for rw in &mut self.sources {
@@ -63,7 +63,7 @@ impl<'a> LectureRepository<'a> {
         }
     }
 
-    fn try_loading(&self, degree: &'static Degree) -> Option<Vec<Lecture>> {
+    fn try_loading(&self, degree: &'static StaticDegree) -> Option<Vec<Lecture>> {
         self.sources
             .iter()
             .find_map(|source| source.load_lectures(degree).ok())

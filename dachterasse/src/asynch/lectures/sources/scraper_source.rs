@@ -1,6 +1,6 @@
 use crate::asynch::datasource::{LoadResult, ReadOnlyDataSource};
 use crate::asynch::scrape::LectureScraper;
-use crate::Degree;
+use crate::StaticDegree;
 use async_trait::async_trait;
 
 #[derive(Default)]
@@ -18,7 +18,7 @@ impl ScraperSource {
 
 #[async_trait]
 impl ReadOnlyDataSource for ScraperSource {
-    async fn load_lectures(&self, degree: &'static Degree) -> LoadResult {
+    async fn load_lectures(&self, degree: &'static StaticDegree) -> LoadResult {
         self.scraper
             .fetch_lecture_details(degree)
             .await

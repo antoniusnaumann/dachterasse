@@ -1,5 +1,5 @@
 use crate::datasource::{LoadResult, ReadOnlyDataSource};
-use crate::Degree;
+use crate::StaticDegree;
 use crate::scrape::LectureScraper;
 
 #[derive(Default)]
@@ -14,7 +14,7 @@ impl ScraperSource {
 }
 
 impl ReadOnlyDataSource for ScraperSource {
-    fn load_lectures(&self, degree: &'static Degree) -> LoadResult {
+    fn load_lectures(&self, degree: &'static StaticDegree) -> LoadResult {
         self.scraper
             .fetch_lecture_details(degree)
             .map_err(|err| err.to_string())

@@ -51,7 +51,7 @@ pub mod asynch {
 
 pub use crate::lectures::client::LectureClient;
 pub use crate::lectures::config::Config;
-pub use crate::lectures::entities::Degree;
+pub use crate::lectures::entities::StaticDegree;
 pub use crate::lectures::entities::Degrees;
 pub use crate::lectures::entities::Lecture;
 

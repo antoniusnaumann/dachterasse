@@ -1,7 +1,7 @@
 use super::config::Config;
 use super::entities::Lecture;
 use crate::datasource::Error;
-use crate::lectures::entities::Degree;
+use crate::lectures::entities::StaticDegree;
 use crate::repository::LectureRepository;
 use crate::sources::*;
 use crate::Degrees;
@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 pub struct LectureClient<'a> {
     repository: LectureRepository<'a>,
-    lectures: HashMap<&'static Degree, Vec<Lecture>>,
+    lectures: HashMap<&'static StaticDegree, Vec<Lecture>>,
 }
 
 impl<'a> LectureClient<'a> {
@@ -44,11 +44,11 @@ impl<'a> LectureClient<'a> {
     }
 
     /// Returns lectures if the client was already initialized or an empty slice otherwise
-    pub fn lectures(&self, degree: &'static Degree) -> &[Lecture] {
+    pub fn lectures(&self, degree: &'static StaticDegree) -> &[Lecture] {
         &self.lectures[degree]
     }
 
-    fn load_lectures(&mut self, degree: &'static Degree) -> Result<&[Lecture], Error> {
+    fn load_lectures(&mut self, degree: &'static StaticDegree) -> Result<&[Lecture], Error> {
         self.lectures
             .insert(degree, self.repository.synchronized_load(degree)?);
         Ok(&self.lectures[degree])
@@ -62,7 +62,7 @@ impl<'a> LectureClient<'a> {
     pub fn filter_lectures(
         &mut self,
         modules: Vec<&str>,
-        degree: &'static Degree,
+        degree: &'static StaticDegree,
     ) -> Vec<&Lecture> {
         // TODO: Error Handling
         self.lectures[degree]

@@ -1,5 +1,5 @@
 use crate::asynch::datasource::{Error, ReadOnlyDataSource, ReadWriteDataSource};
-use crate::lectures::entities::Degree;
+use crate::lectures::entities::StaticDegree;
 
 use crate::lectures::entities::Lecture;
 
@@ -48,7 +48,7 @@ impl<'a> LectureRepository<'a> {
     }
 
     /// Load lectures from repository data sources and write them to read-write sources
-    pub async fn load_and_update(&self, degree: &'static Degree) -> Result<Vec<Lecture>, Error> {
+    pub async fn load_and_update(&self, degree: &'static StaticDegree) -> Result<Vec<Lecture>, Error> {
         match self.try_loading(degree).await {
             Some(lectures) => {
                 for rw in &self.sources {
@@ -65,7 +65,7 @@ impl<'a> LectureRepository<'a> {
         }
     }
 
-    async fn try_loading(&self, degree: &'static Degree) -> Option<Vec<Lecture>> {
+    async fn try_loading(&self, degree: &'static StaticDegree) -> Option<Vec<Lecture>> {
         for source in &self.sources {
             match source.load_lectures(degree).await {
                 Ok(result) => return Some(result),

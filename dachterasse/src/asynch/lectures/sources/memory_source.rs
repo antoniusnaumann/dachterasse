@@ -1,12 +1,12 @@
 use crate::asynch::datasource::*;
-use crate::{Degree, Lecture};
+use crate::{StaticDegree, Lecture};
 use async_std::sync::RwLock;
 use async_trait::async_trait;
 use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct InMemoryDataSource {
-    lectures: RwLock<HashMap<&'static Degree, Vec<Lecture>>>,
+    lectures: RwLock<HashMap<&'static StaticDegree, Vec<Lecture>>>,
 }
 
 impl InMemoryDataSource {
@@ -19,7 +19,7 @@ impl InMemoryDataSource {
 
 #[async_trait]
 impl ReadOnlyDataSource for InMemoryDataSource {
-    async fn load_lectures(&self, degree: &'static Degree) -> LoadResult {
+    async fn load_lectures(&self, degree: &'static StaticDegree) -> LoadResult {
         self.lectures
             .read()
             .await
@@ -31,7 +31,7 @@ impl ReadOnlyDataSource for InMemoryDataSource {
 
 #[async_trait]
 impl ReadWriteDataSource for InMemoryDataSource {
-    async fn save_lectures(&self, degree: &'static Degree, lectures: &[Lecture]) -> SaveResult {
+    async fn save_lectures(&self, degree: &'static StaticDegree, lectures: &[Lecture]) -> SaveResult {
         self.lectures
             .write()
             .await

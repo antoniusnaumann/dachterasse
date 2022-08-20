@@ -93,7 +93,7 @@ use helpers::*;
 mod helpers {
     use std::io;
     use std::ops::{Add, AddAssign};
-    use dachterasse::{Config, Degree, Degrees, Lecture, LectureClient};
+    use dachterasse::{Config, StaticDegree, Degrees, Lecture, LectureClient};
     use crate::*;
 
     pub fn client_with_config_args(args: &[String]) -> LectureClient {
@@ -134,7 +134,7 @@ mod helpers {
         }
     }
 
-    pub fn prompt_degree() -> &'static Degree {
+    pub fn prompt_degree() -> &'static StaticDegree {
         println!("Degrees\n");
 
         let degrees = Degrees::all();

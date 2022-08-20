@@ -3,7 +3,7 @@ use regex::Regex;
 use reqwest::blocking::Client;
 use scraper::{Html, Selector};
 use scraper::element_ref::Text;
-use crate::lectures::entities::Degree;
+use crate::lectures::entities::StaticDegree;
 use super::entities::Lecture;
 
 #[derive(Default)]
@@ -19,7 +19,7 @@ impl LectureScraper {
     }
 
     // TODO: Extract document fetching and parsing into separate method for better testability
-    pub fn fetch_lectures(&self, degree: &Degree) -> Result<Vec<Lecture>, Error> {
+    pub fn fetch_lectures(&self, degree: &StaticDegree) -> Result<Vec<Lecture>, Error> {
         let url = degree.url;
         let document = get_text(url, &self.client)?;
         let fragment = Html::parse_document(&document);
@@ -38,7 +38,7 @@ impl LectureScraper {
     }
 
     // TODO: Extract document fetching and parsing into separate method for better testability
-    pub fn fetch_lecture_details(&self, degree: &Degree) -> Result<Vec<Lecture>, Error> {
+    pub fn fetch_lecture_details(&self, degree: &StaticDegree) -> Result<Vec<Lecture>, Error> {
         let mut lectures = self.fetch_lectures(degree)?;
         for mut lecture in &mut lectures {
             // TODO: Do asynchronously
