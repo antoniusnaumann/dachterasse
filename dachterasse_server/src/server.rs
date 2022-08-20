@@ -1,3 +1,4 @@
+use super::cors::*;
 use super::database::LectureDatabase;
 use dachterasse::{
     asynch::repository::LectureRepository,
@@ -57,4 +58,5 @@ pub fn rocket(pool: PgPool) -> Rocket<Build> {
         .manage(repository)
         .mount("/lectures", module!(lectures))
         .mount("/degrees", module!(degrees))
+        .attach(CORS)
 }

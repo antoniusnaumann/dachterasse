@@ -6,12 +6,12 @@ edition = "2021"
 [lib]
 
 [dependencies]
-dachterasse = { version = "0.1.2", path = "../dachterasse"}
+dachterasse = { version = "0.1.4", path = "../dachterasse"}
 rocket = { version = "^0.5.0-rc.1", features = ["json"]}
-serde = "1.0"
 rocket_modules = "0.1.1"
 shuttle-service = { version = "0.5.0", features = ["web-rocket", "sqlx-postgres"]}
 sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "postgres"]}
+serde = "1.0"
 
 [dependencies.serde_derive]
 version = "1.0"

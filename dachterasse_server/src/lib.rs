@@ -8,6 +8,7 @@ use sqlx::{Executor, PgPool};
 
 pub mod server;
 
+mod cors;
 mod database;
 
 #[shuttle_service::main]
