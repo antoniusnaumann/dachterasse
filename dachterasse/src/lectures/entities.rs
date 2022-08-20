@@ -21,20 +21,20 @@ impl Hash for Lecture {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub enum DegreeLevel {
     Bachelor,
     Master,
 }
 
 // TODO: Serialize to commonly used language abbreviations
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub enum Language {
     German,
     English,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Degree {
     /// The section headline string as found in the module overview for a lecture
     pub name: &'static str,
