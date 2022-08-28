@@ -48,10 +48,10 @@ mod degrees {
     }
 }
 
-pub fn rocket(pool: PgPool) -> Rocket<Build> {
+pub fn rocket(_pool: PgPool) -> Rocket<Build> {
     let repository = LectureRepository::new()
         .source(InMemoryDataSource::new())
-        .source(LectureDatabase::new(pool))
+        // .source(LectureDatabase::new(pool))
         .readonly_source(ScraperSource::new());
 
     rocket::build()
