@@ -12,7 +12,7 @@ mod cors;
 mod database;
 
 #[shuttle_service::main]
-async fn init(#[shared::Postgres] pool: PgPool) -> ShuttleRocket {
+async fn init(#[shuttle_shared_db::Postgres] pool: PgPool) -> ShuttleRocket {
     pool.execute(include_str!("../schema.sql"))
         .await
         .map_err(CustomError::new)?;
